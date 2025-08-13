@@ -1,0 +1,4 @@
+[submodule "mavlink/include/v2.0"]
+	path = mavlink/include/v2.0
+	url = https://github.com/PurpleWildRose/mavlink_lib_official.git
+	branch = master
