@@ -64,7 +64,7 @@
 
 #include <common/mavlink.h>
 
-#include "generic_port.h"
+#include "port.h"
 
 // ------------------------------------------------------------------------------
 //   Defines

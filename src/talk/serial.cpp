@@ -183,10 +183,7 @@ int Serial::read_message(mavlink_message_t &message) {
 // ------------------------------------------------------------------------------
 //   Write to Serial
 // ------------------------------------------------------------------------------
-int
-Serial::
-write_message(const mavlink_message_t &message)
-{
+int Serial::write_message(const mavlink_message_t &message) {
 	char buf[300];
 
 	// Translate message to buffer
@@ -205,11 +202,7 @@ write_message(const mavlink_message_t &message)
 /**
  * throws EXIT_FAILURE if could not open the port
  */
-void
-Serial::
-start()
-{
-
+void Serial::start() {
 	// --------------------------------------------------------------------------
 	//   OPEN PORT
 	// --------------------------------------------------------------------------
@@ -261,10 +254,7 @@ start()
 // ------------------------------------------------------------------------------
 //   Close Serial Port
 // ------------------------------------------------------------------------------
-void
-Serial::
-stop()
-{
+void Serial::stop() {
 	printf("CLOSE PORT\n");
 
 	int result = close(fd);
