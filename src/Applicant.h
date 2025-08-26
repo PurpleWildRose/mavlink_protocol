@@ -14,6 +14,7 @@ class Protocol {
         void parse_argument(int argc, char **argv);
         static void quit_handler(int sig);
         void Demo(int argc, char **argv);
+        void task(Ardupilot_inference &api, bool flag);
 
     private:
         const char *uart_name;

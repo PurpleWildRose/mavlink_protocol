@@ -131,12 +131,154 @@ void Protocol::Demo(int argc, char **argv) {
     port->start();
     ardupilot_interface.start();
     
+    task(ardupilot_interface, true);
+
     ardupilot_interface_quit->stop();
     port->stop();
 
     delete port;
 
     return;
+}
+
+void Protocol::task(Ardupilot_inference &api, bool flag) {
+    api.enable_offboard_control();
+    usleep(500);
+
+    if (flag) {
+        api.arm_disarm(true);
+        usleep(500);
+    }
+
+    // --------------------------------------------------------------------------
+	//   SEND OFFBOARD COMMANDS
+	// --------------------------------------------------------------------------
+	printf("SEND OFFBOARD COMMANDS\n");
+
+	// initialize command data strtuctures
+	mavlink_set_position_target_local_ned_t sp;
+	mavlink_set_position_target_local_ned_t ip = api.initial_position;
+
+	// autopilot_interface.h provides some helper functions to build the command
+
+
+
+
+	// Example 1 - Fly up by to 2m
+	set_position( ip.x ,       // [m]
+			 	  ip.y ,       // [m]
+				  ip.z - 2.0 , // [m]
+				  sp         );
+
+	if(autotakeoff)
+	{
+		sp.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
+	}
+
+	// SEND THE COMMAND
+	api.update_setpoint(sp);
+	// NOW pixhawk will try to move
+
+	// Wait for 8 seconds, check position
+	for (int i=0; i < 8; i++)
+	{
+		mavlink_local_position_ned_t pos = api.real_TimeMessage.local_position_ned;
+		printf("%i CURRENT POSITION XYZ = [ % .4f , % .4f , % .4f ] \n", i, pos.x, pos.y, pos.z);
+		sleep(1);
+	}
+
+    // Example 2 - Set Velocity
+	set_velocity( -1.0       , // [m/s]
+				  -1.0       , // [m/s]
+				   0.0       , // [m/s]
+				   sp        );
+
+	// Example 2.1 - Append Yaw Command
+	set_yaw( ip.yaw + 90.0/180.0*M_PI, // [rad]
+			 sp     );
+
+	// SEND THE COMMAND
+	api.update_setpoint(sp);
+	// NOW pixhawk will try to move
+
+	// Wait for 4 seconds, check position
+	for (int i=0; i < 4; i++)
+	{
+		mavlink_local_position_ned_t pos = api.real_TimeMessage.local_position_ned;
+		printf("%i CURRENT POSITION XYZ = [ % .4f , % .4f , % .4f ] \n", i, pos.x, pos.y, pos.z);
+		sleep(1);
+	}
+
+    if(autotakeoff)
+	{
+		// Example 3 - Land using fixed velocity
+		set_velocity(  0.0       , // [m/s]
+					   0.0       , // [m/s]
+					   1.0       , // [m/s]
+					   sp        );
+
+		sp.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_LAND;
+
+		// SEND THE COMMAND
+		api.update_setpoint(sp);
+		// NOW pixhawk will try to move
+
+		// Wait for 8 seconds, check position
+		for (int i=0; i < 8; i++)
+		{
+			mavlink_local_position_ned_t pos = api.real_TimeMessage.local_position_ned;
+			printf("%i CURRENT POSITION XYZ = [ % .4f , % .4f , % .4f ] \n", i, pos.x, pos.y, pos.z);
+			sleep(1);
+		}
+
+		printf("\n");
+
+		// disarm autopilot
+		api.arm_disarm(false);
+		usleep(100); // give some time to let it sink in
+	}
+
+	// --------------------------------------------------------------------------
+	//   STOP OFFBOARD MODE
+	// --------------------------------------------------------------------------
+
+	api.disable_offboard_control();
+
+	// now pixhawk isn't listening to setpoint commands
+
+
+	// --------------------------------------------------------------------------
+	//   GET A MESSAGE
+	// --------------------------------------------------------------------------
+	printf("READ SOME MESSAGES \n");
+
+	// copy current messages
+	Pixhawk_info messages = api.real_TimeMessage;
+
+	// local position in ned frame
+	mavlink_local_position_ned_t pos = messages.local_position_ned;
+	printf("Got message LOCAL_POSITION_NED (spec: https://mavlink.io/en/messages/common.html#LOCAL_POSITION_NED)\n");
+	printf("    pos  (NED):  %f %f %f (m)\n", pos.x, pos.y, pos.z );
+
+	// hires imu
+	mavlink_highres_imu_t imu = messages.highres_imu;
+	printf("Got message HIGHRES_IMU (spec: https://mavlink.io/en/messages/common.html#HIGHRES_IMU)\n");
+	printf("    ap time:     %lu \n", imu.time_usec);
+	printf("    acc  (NED):  % f % f % f (m/s^2)\n", imu.xacc , imu.yacc , imu.zacc );
+	printf("    gyro (NED):  % f % f % f (rad/s)\n", imu.xgyro, imu.ygyro, imu.zgyro);
+	printf("    mag  (NED):  % f % f % f (Ga)\n"   , imu.xmag , imu.ymag , imu.zmag );
+	printf("    baro:        %f (mBar) \n"  , imu.abs_pressure);
+	printf("    altitude:    %f (m) \n"     , imu.pressure_alt);
+	printf("    temperature: %f C \n"       , imu.temperature );
+
+	printf("\n");
+
+
+	// --------------------------------------------------------------------------
+	//   END OF COMMANDS
+	// --------------------------------------------------------------------------
+
+	return;
 }
 
 Generic_Port* Protocol::port = nullptr;

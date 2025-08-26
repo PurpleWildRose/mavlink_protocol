@@ -69,6 +69,9 @@
 // ------------------------------------------------------------------------------
 
 struct Time_stamps {
+    Time_stamps() {
+        reset_timestamps();
+    }
     uint64_t heartbeat;
 	uint64_t sys_status;
 	uint64_t battery_status;
@@ -79,6 +82,20 @@ struct Time_stamps {
 	uint64_t position_target_global_int;
 	uint64_t highres_imu;
 	uint64_t attitude;
+
+    // 将所有时间戳重置为 0，常用于飞控重连时清空历史状态，避免使用旧数据。
+    void reset_timestamps() {
+		heartbeat = 0;
+		sys_status = 0;
+		battery_status = 0;
+		radio_status = 0;
+		local_position_ned = 0;
+		global_position_int = 0;
+		position_target_local_ned = 0;
+		position_target_global_int = 0;
+		highres_imu = 0;
+		attitude = 0;
+	}
 };
 
 // Struct containing information on the MAV we are currently connected to
@@ -122,6 +139,10 @@ struct Pixhawk_info {
 
 	// Time Stamps
 	Time_stamps time_stamps;
+
+    void reset_timestamps() {
+        time_stamps.reset_timestamps();
+    }
 };
 
 

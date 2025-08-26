@@ -553,10 +553,10 @@ void Ardupilot_inference::start() {
 		usleep(500000); // check at 2Hz
 	}
 
-    printf("Found Pixhawk device.\n");
+    // printf("Found Pixhawk device output message.\n");
+    // printf("\n");
 
 	// now we know autopilot is sending messages
-	printf("\n");
     
     // --------------------------------------------------------------------------
 	//   GET SYSTEM and COMPONENT IDs
