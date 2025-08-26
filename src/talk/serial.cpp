@@ -241,7 +241,7 @@ void Serial::start() {
 	// --------------------------------------------------------------------------
 	printf("Connected to %s with %d baud, 8 data bits, no parity, 1 stop bit (8N1)\n", uart_name, baudrate);
 	lastStatus.packet_rx_drop_count = 0;
-
+	
 	is_open = true;
 
 	printf("\n");

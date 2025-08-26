@@ -19,4 +19,5 @@ add_library(baseprotocol SHARED ${PROTO_SRC})
 file(GLOB_RECURSE APPLICATION_SRC "src/*cpp")
 add_executable(${PROJECT_NAME} ${APPLICATION_SRC})
 target_link_libraries(${PROJECT_NAME} 
-                            baseprotocol)
+                            baseprotocol
+                            pthread)

@@ -1,4 +1,5 @@
 #include "ardupilot.h"
+#include "common.h"
 
 // ----------------------------------------------------------------------------------
 //   Time
@@ -171,7 +172,7 @@ Ardupilot_inference::Ardupilot_inference(Generic_Port *port_) :
     write_count(0),
     reading_status(0),
     writing_status(0),
-    control_status(0),
+    control_status(false),
 
     time_to_exit(false),  // flag to signal thread exit
 
@@ -531,7 +532,7 @@ void Ardupilot_inference::start() {
         fprintf(stderr,"ERROR: port not open\n");
         throw 1;
     }
-
+    
     // --------------------------------------------------------------------------
 	//   READ THREAD
 	// --------------------------------------------------------------------------
@@ -540,7 +541,7 @@ void Ardupilot_inference::start() {
 	if ( result ) throw result;
     printf("\n");
 
-
+    
     // --------------------------------------------------------------------------
 	//   CHECK FOR MESSAGES
 	// --------------------------------------------------------------------------
@@ -552,11 +553,11 @@ void Ardupilot_inference::start() {
 		usleep(500000); // check at 2Hz
 	}
 
-    printf("Found\n");
+    printf("Found Pixhawk device.\n");
 
 	// now we know autopilot is sending messages
 	printf("\n");
-
+    
     // --------------------------------------------------------------------------
 	//   GET SYSTEM and COMPONENT IDs
 	// --------------------------------------------------------------------------
@@ -569,14 +570,14 @@ void Ardupilot_inference::start() {
 	if ( not system_id )
 	{
 		system_id = real_TimeMessage.sysid;
-		printf("GOT VEHICLE SYSTEM ID: %i\n", system_id );
+		printf("GOT COPTER SYSTEM ID: %i\n", system_id );
 	}
 
     // Component ID
 	if ( not autopilot_id )
 	{
 		autopilot_id = real_TimeMessage.compid;
-		printf("GOT AUTOPILOT COMPONENT ID: %i\n", autopilot_id);
+		printf("GOT COPTER COMPONENT ID: %i\n", autopilot_id);
 		printf("\n");
 	}
 
@@ -622,7 +623,6 @@ void Ardupilot_inference::start() {
 
 	// now we're streaming setpoint commands
 	printf("\n");
-
 
 	// Done!
 	return;
