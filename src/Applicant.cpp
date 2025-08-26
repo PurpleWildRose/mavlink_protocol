@@ -117,7 +117,7 @@ void Protocol::Demo(int argc, char **argv) {
     parse_argument(argc, argv);
 
     if (use_udp) {
-        // port = new 
+        port = new UDP(this->udp_ip, this->udp_port);
     } else {
         port = new Serial(this->uart_name, this->baudrate);
     }
