@@ -120,7 +120,7 @@ int Serial::read_message(mavlink_message_t &message) {
 		// the parsing
         // MAVLINK_COMM_1：通信通道标识（MAVLink 支持多通道，COMM_1 通常对应串口 1）。
         /*************************
-         * 返回值 sgReceived：表示解析结果，通常：
+         * 返回值 msgReceived：表示解析结果，通常：
 
             1：成功解析出一条完整的 MAVLink 消息。
             0：尚未解析出完整消息（需要继续接收更多字符）。

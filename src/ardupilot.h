@@ -133,7 +133,7 @@ class Ardupilot_inference {
     public:
         char reading_status;
         char writing_status;
-        char control_status;
+        bool control_status;
         uint64_t write_count;
 
         int system_id;
@@ -150,6 +150,7 @@ class Ardupilot_inference {
         int	 arm_disarm( bool flag );
         void enable_offboard_control();
         void disable_offboard_control();
+        bool get_offboard_control();
 
         void start();
 	    void stop();
